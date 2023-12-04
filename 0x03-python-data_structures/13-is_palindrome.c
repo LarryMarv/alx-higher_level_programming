@@ -1,80 +1,72 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "lists.h"
 
-/**
- *is_palindrome - Checks if a singly linked list is a palindrome
- *@head: The head of the singly linked list
- *
- *Return: 0 if it is not a palindrome, 1 if it is a palindrome
- */
-int is_palindrome(listint_t **head)
-{
-	listint_t *start = NULL, *end = NULL;
-	unsigned int i = 0, len = 0, len_cyc = 0, len_list = 0;
-
-	if (head == NULL)
-		return (0);
-
-	if (*head == NULL)
-		return (1);
-
-	start = *head;
-	len = listint_len(start);
-	len_cyc = len * 2;
-	len_list = len_cyc - 2;
-	end = *head;
-
-	for (; i < len_cyc; i = i + 2)
-	{
-		if (start[i].n != end[len_list].n)
-			return (0);
-
-		len_list = len_list - 2;
-
-		return (1);
-	}
+listint_t *reverse_listint(listint_t **head);
+int is_palindrome(listint_t **head);
 
 /**
- *get_nodeint_at_index - Gets a node from a linked list
- *@head: The head of the linked list
- *@index: The index to find in the linked list
+ * reverse_listint - Reverses a singly-linked listint_t list.
+ * @head: A pointer to the starting node of the list to reverse.
  *
- *Return: The specific node of the linked list
+ * Return: A pointer to the head of the reversed list.
  */
-listint_t *get_nodeint_at_index(listint_t *head, unsigned int index)
+listint_t *reverse_listint(listint_t **head)
 {
-	listint_t *current = head;
-	unsigned int iter_times = 0;
+	listint_t *node = *head, *next, *prev = NULL;
 
-	if (head)
+	while (node)
 	{
-		while (current != NULL)
-		{
-			if (iter_times == index)
-				return (current);
-			current = current->next;
-			++iter_times;
-		}
+		next = node->next;
+		node->next = prev;
+		prev = node;
+		node = next;
 	}
-	return (NULL);
+
+	*head = prev;
+	return (*head);
 }
 
 /**
- *slistint_len - Counts the number of elements in a linked list
- *@h: The linked list to count
+ * is_palindrome - Checks if a singly linked list is a palindrome.
+ * @head: A pointer to the head of the linked list.
  *
- *Return: Number of elements in the linked list
+ * Return: If the linked list is not a palindrome - 0.
+ *         If the linked list is a palindrome - 1.
  */
-size_t listint_len(const listint_t *h)
+int is_palindrome(listint_t **head)
 {
-	int lenght = 0;
+	listint_t *tmp, *rev, *mid;
+	size_t size = 0, i;
 
-	while (h != NULL)
+	if (*head == NULL || (*head)->next == NULL)
+		return (1);
+
+	tmp = *head;
+	while (tmp)
 	{
-		++lenght;
-		h = h->next;
+		size++;
+		tmp = tmp->next;
 	}
 
-	return (lenght);
+	tmp = *head;
+	for (i = 0; i < (size / 2) - 1; i++)
+		tmp = tmp->next;
+
+	if ((size % 2) == 0 && tmp->n != tmp->next->n)
+		return (0);
+
+	tmp = tmp->next->next;
+	rev = reverse_listint(&tmp);
+	mid = rev;
+
+	tmp = *head;
+	while (rev)
+	{
+		if (tmp->n != rev->n)
+			return (0);
+		tmp = tmp->next;
+		rev = rev->next;
+	}
+	reverse_listint(&mid);
+
+	return (1);
 }
